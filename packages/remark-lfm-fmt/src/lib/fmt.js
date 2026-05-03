@@ -4,6 +4,9 @@
  * @typedef {import('vfile').VFile} VFile
  */
 
+/// <reference types="mdast-util-math" />
+/// <reference types="mdast-util-directive" />
+
 import {
   concatToken,
   formatMath,
@@ -25,7 +28,9 @@ export default function remarkLfmFmt(config = {}) {
   const { fwPunctuation = true, enabledRules = {} } = config;
   const enabledMathRules =
     enabledRules.math ??
-    Object.keys(mathReplaceRules);
+    /** @type {import("./rule.js").MathFormatRules[]} */ (
+      Object.keys(mathReplaceRules)
+    );
 
   /** @param {string} text */
   const formatText = (text) => _formatText(text, fwPunctuation);
@@ -35,6 +40,7 @@ export default function remarkLfmFmt(config = {}) {
     if (node && "children" in node) {
       return findFirstDescendant(node.children[0]);
     }
+
     return node;
   }
 
@@ -43,6 +49,7 @@ export default function remarkLfmFmt(config = {}) {
     if (node && "children" in node) {
       return findLastDescendant(node.children[node.children.length - 1]);
     }
+
     return node;
   }
 
@@ -53,6 +60,7 @@ export default function remarkLfmFmt(config = {}) {
    */
   function format(node) {
     switch (node.type) {
+      // BlockContent for children
       case "blockquote":
       case "list":
       case "table":
@@ -142,6 +150,21 @@ export default function remarkLfmFmt(config = {}) {
         node.value = formatMath(node.value, enabledMathRules);
         break;
       }
+
+      // Do nothing.
+      // case "yaml":
+      // case "html":
+      // case "code":
+      // case "inlineCode":
+      // case "break":
+      // case "thematicBreak":
+      // case "image":
+      // case "imageReference":
+      // case "definition":
+      // case "footnoteDefinition":
+      // case "footnoteReference":
+      // case "leafDirective":
+      // case "textDirective": // do not parse
     }
   }
 
@@ -169,6 +192,7 @@ export default function remarkLfmFmt(config = {}) {
       const newChildren = [];
       let currentText = "";
 
+      // @ts-expect-error 有 children
       for (const child of node.children) {
         if (child.type === "text" || child.type === "textDirective") {
           const content =
@@ -187,6 +211,7 @@ export default function remarkLfmFmt(config = {}) {
         newChildren.push({ type: "text", value: currentText });
       }
 
+      // @ts-expect-error 有 children
       node.children = newChildren;
     });
 
@@ -197,6 +222,7 @@ export default function remarkLfmFmt(config = {}) {
    * The plugin.
    *
    * @param {Root} tree
+   *   Tree.
    * @returns
    *   Nothing.
    */

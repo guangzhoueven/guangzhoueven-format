@@ -10,7 +10,7 @@ export const CJK =
   "\u2e80-\u2eff\u2f00-\u2fdf\u3040-\u309f\u30a0-\u30fa\u30fc-\u30ff\u3100-\u312f\u3200-\u32ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff";
 export const CJK_REGEX = new RegExp(`[${CJK}]`);
 
-export const FW_PUNCTUATION = /[，。【！「」『』❲❳［］（）《》！？"”、～；：]/;
+export const FW_PUNCTUATION = /[，。【】「」『』❲❳［］（）《》！？“”、～；：]/;
 export const HW_PUNCTUATION = /[\!\?\.,:;]/;
 export const TO_HW_BEGIN = /^[\!\?\.,:;] */;
 
@@ -101,15 +101,15 @@ export const shouldAddSpace = (left, right, addExtraSpace = false) => {
  */
 export const textPreprocessRules = [
   {
-    pattern: CjkRgx(`({HW_PUNCTUATION.source})({CJK})`, "g"),
+    pattern: CjkRgx(`(${HW_PUNCTUATION.source})({CJK})`, "g"),
     replace: "$1 $2",
   },
   {
-    pattern: CjkRgx(`({CJK}) +({HW_PUNCTUATION.source})`, "g"),
+    pattern: CjkRgx(`({CJK}) +(${HW_PUNCTUATION.source})`, "g"),
     replace: "$1$2",
   },
   {
-    pattern: CjkRgx(`({CJK}) +({FW_PUNCTUATION.source})`, "g"),
+    pattern: CjkRgx(`({CJK}) +(${FW_PUNCTUATION.source})`, "g"),
     replace: "$1$2",
   },
 ];
@@ -122,7 +122,7 @@ export const textPreprocessRules = [
 export const textPostprocessRules = [
   {
     // see immccn123/lg-solution-formatter#102
-    pattern: CjkRgx(`(") +({CJK})`, "g"),
+    pattern: CjkRgx(`(”) +({CJK})`, "g"),
     replace: "$1$2",
   },
 ];
@@ -144,15 +144,15 @@ export const toFwExtraRules = [
 ];
 
 export const mathReplaceRules = {
-  "sym/star-to-times": { pattern: /\*/g, replace: " \\times " },
-  "sym/less-equal": { pattern: /<=/g, replace: " \\le " },
-  "sym/greater-equal": { pattern: />=/g, replace: " \\ge " },
-  "sym/not-equal": { pattern: /\!=/g, replace: " \\neq " },
-  "sym/double-equal-to-single": { pattern: /==/g, replace: " = " },
-  "sym/arrow-right-to": { pattern: /(-+)>/g, replace: " \\to " },
-  "sym/arrow-left-gets": { pattern: /<(-+)/g, replace: " \\gets " },
-  "sym/double-arrow-implies": { pattern: /(=+)>/g, replace: " \\Rightarrow " },
-  "fn/gcd": { pattern: /(?<![\\{}])gcd/g, replace: " \\gcd " },
+  "sym/star-to-times": { pattern: /\*/g, replace: " \\times " }, // * -> 乘号
+  "sym/less-equal": { pattern: /<=/g, replace: " \\le " }, // 小于等于
+  "sym/greater-equal": { pattern: />=/g, replace: " \\ge " }, // 大于等于
+  "sym/not-equal": { pattern: /\!=/g, replace: " \\neq " }, // 不等于
+  "sym/double-equal-to-single": { pattern: /==/g, replace: " = " }, // 不允许 ==
+  "sym/arrow-right-to": { pattern: /(-+)>/g, replace: " \\to " }, // ->
+  "sym/arrow-left-gets": { pattern: /<(-+)/g, replace: " \\gets " }, // <-
+  "sym/double-arrow-implies": { pattern: /(=+)>/g, replace: " \\Rightarrow " }, // =>
+  "fn/gcd": { pattern: /(?<![\\{}])gcd/g, replace: " \\gcd " }, // gcd -> \gcd
   "fn/min": { pattern: /(?<![\\{}])min/g, replace: " \\min " },
   "fn/max": { pattern: /(?<![\\{}])max/g, replace: " \\max " },
   "fn/log": { pattern: /(?<![\\{}])log/g, replace: " \\log " },
@@ -168,14 +168,14 @@ export const mathReplaceRules = {
     pattern: /(?<!\\operatorname{)MEX(?!})/g,
     replace: " \\operatorname{MEX}",
   },
-  "syn/array-to-subscript": {
+  "syn/array-to-subscript": /** @type {ReplaceRule} */ ({
     pattern: /(?<!\\|[a-zA-Z])([a-zA-Z]+)((\[([^\]])+?\])+)/g,
     replace: (_, name, items) => {
       return (
         name + "_{" + items.replace(/\[([^\]]+?)\]/g, "$1,").slice(0, -1) + "}"
       );
     },
-  },
+  }), // dp[i][j][k] = dp[i][j][k - 1] + a[i]
 };
 
 /**

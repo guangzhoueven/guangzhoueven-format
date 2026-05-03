@@ -23,11 +23,13 @@ export const formatText = (text, fwPunctuation) => {
   let res = pangu.spacingText(removeDuplSpaces(text.trim()));
 
   textPreprocessRules.forEach((rule) => {
+    // @ts-expect-error 有点搞不明白为什么这里必须针对 typeof rule.replace === "string" 条件分开写一样的东西
     res = res.replace(rule.pattern, rule.replace);
   });
 
   if (fwPunctuation) {
     toFwExtraRules.forEach((rule) => {
+      // @ts-expect-error 同上
       res = res.replace(rule.pattern, rule.replace);
     });
     res = punctuationCjkToFw(res);
@@ -38,6 +40,7 @@ export const formatText = (text, fwPunctuation) => {
   }
 
   textPostprocessRules.forEach((rule) => {
+    // @ts-expect-error
     res = res.replace(rule.pattern, rule.replace);
   });
 
@@ -56,6 +59,7 @@ export const formatMath = (tex, enabledRules) => {
 
   enabledRules.forEach((ruleId) => {
     const rule = mathReplaceRules[ruleId];
+    // @ts-ignore 同上
     res = res.replace(rule.pattern, rule.replace);
   });
 
@@ -83,6 +87,7 @@ export const concatToken = (left, right, addExtraSpace = false) => {
   if (isCjkPunctuation(leftEnd) || isCjkPunctuation(rightBegin))
     return { left: tLeft, right: tRight, addSpace: false, addSpaceNext: false };
 
+  // **好的**, 但是
   if (isCjk(leftEnd) && TO_HW_BEGIN.test(tRight))
     return {
       left: tLeft,

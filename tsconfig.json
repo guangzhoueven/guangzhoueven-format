@@ -1,31 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "checkJs": true,
+    "declaration": true,
+    "exactOptionalPropertyTypes": true,
+    "lib": ["ES2020", "ESNext"],
+    "module": "ES2020",
+    "moduleResolution": "Bundler",
     "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "preserve",
-
-    /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Paths */
-    "baseUrl": ".",
-    "paths": {
-      "@imkdown/lg-solution-formatter": ["./index.d.ts"]
-    }
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2020",
+    "baseUrl": "./",
+    "noEmit": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "*.d.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["coverage/", "node_modules/", "**/example.js"],
+  "include": ["test/*.js", "packages/**/*.js"]
 }

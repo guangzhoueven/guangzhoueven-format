@@ -11,7 +11,7 @@
 import { remark } from "remark";
 import remarkMath from "remark-math";
 import remarkStringify from "remark-stringify";
-import remarkLfmFmt from "./lib/fmt.js";
+import remarkLfmFmt from "@imkdown/remark-lfm-fmt";
 import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
 
@@ -21,6 +21,10 @@ import remarkDirective from "remark-directive";
 
 /**
  * @typedef {{
+ *   clang?: {
+ *     enabled?: boolean,
+ *     config?: string
+ *   };
  *   fwPunctuation?: boolean;
  *   rlfConfig?: RlfConfig;
  *  }} Config
@@ -32,12 +36,22 @@ import remarkDirective from "remark-directive";
  */
 const formatSolution = async (sourceStr, config = {}) => {
   const { fwPunctuation = true, rlfConfig } = config;
-  const rem = remark()
+  let rem = remark()
     .use(remarkMath, { singleDollarTextMath: true })
     .use(remarkGfm)
     .use(remarkLfmFmt, { ...rlfConfig, fwPunctuation })
     .use(remarkStringify, { bullet: "-", rule: "-" })
     .use(remarkDirective);
+
+  if (config.clang?.enabled) {
+    if (import.meta.env) {
+      const vitePlugin = await import("@imkdown/remark-clang-fmt-wasm/vite.js");
+      rem = rem.use(vitePlugin.default, config.clang.config);
+    } else {
+      const nodePlugin = await import("@imkdown/remark-clang-fmt-wasm/node.js");
+      rem = rem.use(nodePlugin.default, config.clang.config);
+    }
+  }
 
   const file = await rem.process(sourceStr);
   return String(file);
