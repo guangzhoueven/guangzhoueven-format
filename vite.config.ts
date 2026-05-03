@@ -5,6 +5,8 @@ import wasm from "vite-plugin-wasm";
 import child_process from "child_process";
 import path from "path";
 
+const parentDir = path.resolve(__dirname, "..");
+
 const getCommitHash = () => {
   try {
     return child_process.execSync("git rev-parse HEAD").toString().trim();
@@ -21,10 +23,13 @@ export default defineConfig({
   },
   build: {
     cssMinify: "lightningcss",
+    rollupOptions: {
+      external: ["remark", "remark-directive", "remark-gfm", "remark-math", "remark-stringify", "pangu", "unist-util-visit"],
+    },
   },
   resolve: {
     alias: {
-      "@imkdown": path.resolve(__dirname, "../"),
+      "@imkdown/lg-solution-formatter": path.resolve(__dirname, "./index.js"),
     },
   },
 });
